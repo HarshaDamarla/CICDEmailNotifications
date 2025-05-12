@@ -1,23 +1,16 @@
-package com.arrays.programs;
-
-import java.util.Scanner;
+import java.util.Arrays;
 
 public class PrintElements {
+    public static void main(String[] args) {
+        int[] a = {5, 10, 15, 20, 25};
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		Scanner s = new Scanner(System.in);
-		System.out.println("Enter the size of an array: ");
-		int size = s.nextInt();
-		int a[]=new int[size];
-		
-		for(int i=0; i<a.length; i++)
-		{
-			a[i] = s.nextInt();
-		}
-		System.out.println(a[0]);
-		System.out.println(a[a.length-1]);
+        System.out.println("All elements in the array:");
+        for (int num : a) {
+            System.out.println(num);
+        }
 
-	}
-
+        System.out.println("First element: " + a[0]);
+        System.out.println("Last element: " + a[a.length - 1]);
+        System.out.println("Full array using Arrays.toString(): " + Arrays.toString(a));
+    }
 }
