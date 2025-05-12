@@ -51,7 +51,7 @@ pipeline {
         </ul>
         <p>Console Output: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
         """,
-        mail to: 'harshadamarla98@gmail.com',
+        to: 'harshadamarla98@gmail.com',
         attachLog: true,
         mimeType: 'text/html'
       )
@@ -64,7 +64,7 @@ pipeline {
         <p>The Jenkins pipeline <b>${env.JOB_NAME}</b> <span style='color:red;'>failed</span>.</p>
         <p>Check console output and errors: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
         """,
-        mail to: 'harshadamarla98@gmail.com',
+        to: 'harshadamarla98@gmail.com',
         attachLog: true,
         mimeType: 'text/html'
       )
