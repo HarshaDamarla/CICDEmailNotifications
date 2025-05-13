@@ -15,7 +15,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Tool used: Git'
-                git url: 'https://github.com/HarshaDamarla/CICDEmailNotifications.git'
+                git url: 'https://github.com/HarshaDamarla/CICDEmailNotifications.git',
+                branch: 'main'
             }
         }
 
