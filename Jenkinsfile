@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        jdk 'jdk17'  // Make sure this matches your Jenkins Global Tool Configuration
+        jdk 'JDK17'  // Make sure this matches your Jenkins Global Tool Configuration
     }
 
     environment {
