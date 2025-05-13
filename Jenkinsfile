@@ -37,7 +37,7 @@ pipeline {
                 sh 'echo "5\n10\n15\n20\n25" | java -cp out PrintElements'
             }
         }
-    }
+    
 
     post {
         success {
