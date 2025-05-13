@@ -10,12 +10,12 @@ pipeline {
         PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/HarshaDamarla/CICDEmailNotifications.git'
-            }
-        }
+    stage('Checkout') {
+    steps {
+        git branch: 'main', url: 'https://github.com/HarshaDamarla/CICDEmailNotifications.git'
+    }
+}
+
 
         stage('Compile Java Programs') {
             steps {
