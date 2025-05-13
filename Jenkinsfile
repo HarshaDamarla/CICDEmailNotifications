@@ -1,6 +1,15 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'JDK17' // Make sure 'JDK17' matches your Jenkins JDK tool name
+    }
+
+    environment {
+        JAVA_HOME = tool 'JDK17'
+        PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
+    }
+
     stages {
         stage('Checkout') {
             steps {
