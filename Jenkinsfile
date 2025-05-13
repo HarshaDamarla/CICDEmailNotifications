@@ -8,6 +8,7 @@ pipeline {
     environment {
         JAVA_HOME = "${tool 'JDK17'}"
         PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
+        LOG_FILE = "build-${env.BUILD_NUMBER}.log"
     }
 
     stages {
@@ -62,22 +63,19 @@ pipeline {
         success {
             mail to: 'harshadamarla98@gmail.com',
                 subject: "✅ SUCCESS: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
-                body: """The Jenkins pipeline <b>${env.JOB_NAME}</b> <span style='color:green;'>completed successfully</span>.
+                body: """The Jenkins pipeline ${env.JOB_NAME} build was successfully
 
-📋 Console Output: ${env.BUILD_URL}
-📎 Logs attached.""",
-                attachmentsPattern: "**/build-${env.BUILD_NUMBER}.log"
+✔️ Logs were generated and stored locally in '${env.LOG_FILE}'.
+📋 Console Output: ${env.BUILD_URL}"""
         }
 
         failure {
             mail to: 'harshadamarla98@gmail.com',
                 subject: "❌ FAILURE: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
-                body: """The Jenkins pipeline <b>${env.JOB_NAME}</b> <span style='color:red;'>failed</span>.
+                body: """The Jenkins pipeline ${env.JOB_NAME} build failed.
 
-⚠️ Check errors in the build.
-📋 Console Output: ${env.BUILD_URL}
-📎 Logs attached.""",
-                attachmentsPattern: "**/build-${env.BUILD_NUMBER}.log"
+⚠️ Please check the errors.
+📋 Console Output: ${env.BUILD_URL}"""
         }
     }
 }
