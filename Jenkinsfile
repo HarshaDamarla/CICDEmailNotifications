@@ -62,11 +62,10 @@ pipeline {
                 to: "${env.RECIPIENT}",
                 subject: "✅ SUCCESS: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
                 body: """
-                <p>🎉 The Jenkins job <b>${env.JOB_NAME}</b> completed successfully.</p>
+                The Jenkins pipeline ${env.JOB_NAME} build was successfull.
                 <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
                 """,
-                mimeType: 'text/html',
-                attachLog: true
+                mimeType: 'text/html'
             )
         }
 
@@ -75,11 +74,10 @@ pipeline {
                 to: "${env.RECIPIENT}",
                 subject: "❌ FAILURE: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
                 body: """
-                <p>⚠️ The Jenkins job <b>${env.JOB_NAME}</b> has failed.</p>
+                The Jenkins pipeline ${env.JOB_NAME} build failed.
                 <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
                 """,
-                mimeType: 'text/html',
-                attachLog: true
+                mimeType: 'text/html'
             )
         }
     }
