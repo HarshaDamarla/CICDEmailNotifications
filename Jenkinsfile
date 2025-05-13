@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        JAVA_HOME = ${tool 'JDK17'}
+        JAVA_HOME = "${tool 'JDK17'}"
         PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
         LOG_FILE = "build-${env.BUILD_NUMBER}.log"
     }
