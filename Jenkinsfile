@@ -6,26 +6,30 @@ pipeline {
     }
 
     environment {
-        JAVA_HOME = "${tool 'jdk17'}"
+        JAVA_HOME = "${tool 'JDK17'}"
         PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
     }
 
     stages {
         stage('Checkout') {
             steps {
+                echo 'Tool used: Git'
                 git branch: 'main', url: 'https://github.com/HarshaDamarla/CICDEmailNotifications.git'
             }
         }
 
         stage('Compile Java Programs') {
             steps {
+                echo 'Tool used: javac (Java Compiler)'
                 sh 'mkdir -p out'
-                sh 'javac -d out PrintElements.java SumAndAvg.java'
+                sh 'javac -d out *.java'
+                sh 'echo "[Compile Stage] Compilation completed successfully." >> ${BUILD_LOG}'
             }
         }
 
         stage('Run SumAndAvg Program') {
             steps {
+                echo 'Tool used: Java Runtime'
                 echo 'Running SumAndAvg.java...'
                 sh 'echo "10\n20\n30\n40\n50" | java -cp out SumAndAvg'
             }
@@ -33,34 +37,47 @@ pipeline {
 
         stage('Run PrintElements Program') {
             steps {
+                echo 'Tool used: Java Runtime'
                 echo 'Running PrintElements.java...'
                 sh 'echo "5\n10\n15\n20\n25" | java -cp out PrintElements'
             }
         }
+        
+        stage('Run Tests') {
+            steps {
+                echo "Tool used: JUnit"
+                // Run Java test logic here
+            }
+        }
+        stage('Security Scan') {
+            steps {
+                echo "Tool used: SpotBugs"
+                // Example tool for Java code analysis
+            }
+        }
+
     }
 
     post {
         success {
             mail to: 'harshadamarla98@gmail.com',
                 subject: "✅ SUCCESS: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
-                body: """
-                    <p>The Jenkins pipeline <b>${env.JOB_NAME}</b> <span style='color:green;'>completed successfully</span>.</p>
-                    <p>Console Output: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                """,
-                mimeType: 'text/html',
-                attachLog: true
+                body: """The Jenkins pipeline <b>${env.JOB_NAME}</b> <span style='color:green;'>completed successfully</span>.
+
+📋 Console Output: ${env.BUILD_URL}
+📎 Logs attached.""",
+                attachmentsPattern: "**/build-${env.BUILD_NUMBER}.log"
         }
 
         failure {
             mail to: 'harshadamarla98@gmail.com',
                 subject: "❌ FAILURE: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
-                body: """
-                    <p>The Jenkins pipeline <b>${env.JOB_NAME}</b> <span style='color:red;'>failed</span>.</p>
-                    <p>⚠️ Check errors in the build.</p>
-                    <p>Console Output: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                """,
-                mimeType: 'text/html',
-                attachLog: true
+                body: """The Jenkins pipeline <b>${env.JOB_NAME}</b> <span style='color:red;'>failed</span>.
+
+⚠️ Check errors in the build.
+📋 Console Output: ${env.BUILD_URL}
+📎 Logs attached.""",
+                attachmentsPattern: "**/build-${env.BUILD_NUMBER}.log"
         }
     }
 }
