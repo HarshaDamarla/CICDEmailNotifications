@@ -2,13 +2,14 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK17' // Make sure 'JDK17' matches your Jenkins JDK tool name
+        jdk 'JDK17'
     }
 
     environment {
         JAVA_HOME = tool 'JDK17'
         PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
         RECIPIENT = 'harshadamarla98@gmail.com'
+        LOG_FILE = 'build_output.log'
     }
 
     stages {
@@ -42,12 +43,14 @@ pipeline {
                 sh 'java -cp out PrintElements'
             }
         }
-                stage('Run Tests') {
+
+        stage('Run Tests') {
             steps {
                 echo "Tool used: JUnit"
                 // Run Java test logic here
             }
         }
+
         stage('Security Scan') {
             steps {
                 echo "Tool used: SpotBugs"
@@ -57,28 +60,29 @@ pipeline {
     }
 
     post {
-        success {
-            mail (
-                to: "${env.RECIPIENT}",
-                subject: "✅ SUCCESS: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
-                body: """
-                The Jenkins pipeline ${env.JOB_NAME} build was successfull.
-                <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                """,
-                mimeType: 'text/html'
-            )
-        }
+        always {
+            script {
+                // Capture logs using Jenkins API
+                def logs = currentBuild.rawBuild.getLog(10000).join('\n')
+                def subjectPrefix = currentBuild.currentResult == 'SUCCESS' ? '✅ SUCCESS' : '❌ FAILURE'
+                
+                mail (
+                    to: "${env.RECIPIENT}",
+                    subject: "${subjectPrefix}: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
+                    body: """
+Build Result: ${currentBuild.currentResult}
+Job: ${env.JOB_NAME}
+Build Number: ${env.BUILD_NUMBER}
+Build URL: ${env.BUILD_URL}
 
-        failure {
-            mail (
-                to: "${env.RECIPIENT}",
-                subject: "❌ FAILURE: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
-                body: """
-                The Jenkins pipeline ${env.JOB_NAME} build failed.
-                <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                """,
-                mimeType: 'text/html'
-            )
+=========== Build Logs ===========
+${logs}
+==================================
+
+                    """.stripIndent(),
+                    mimeType: 'text/plain'
+                )
+            }
         }
     }
 }
