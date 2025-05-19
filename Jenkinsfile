@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK17'
+        jdk 'JDK17' // Make sure 'JDK17' matches your Jenkins JDK tool name
     }
 
     environment {
@@ -16,6 +16,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Tool used: Git'
+                sh 'echo "Tool used: Git" | tee ${LOG_FILE}'
                 git url: 'https://github.com/HarshaDamarla/CICDEmailNotifications.git', branch: 'main'
             }
         }
@@ -23,8 +24,9 @@ pipeline {
         stage('Compile Java Programs') {
             steps {
                 echo 'Tool used: javac (Java Compiler)'
-                sh 'mkdir -p out'
-                sh 'javac -d out PrintElements.java SumAndAvg.java'
+                sh 'echo "Tool used: javac (Java Compiler)" | tee -a ${LOG_FILE}'
+                sh 'mkdir -p out | tee -a ${LOG_FILE}'
+                sh 'javac -d out PrintElements.java SumAndAvg.java | tee -a ${LOG_FILE}'
             }
         }
 
@@ -32,7 +34,8 @@ pipeline {
             steps {
                 echo 'Tool used: Java Runtime'
                 echo 'Running SumAndAvg.java...'
-                sh 'java -cp out SumAndAvg'
+                sh 'echo "Running SumAndAvg.java..." | tee -a ${LOG_FILE}'
+                sh 'java -cp out SumAndAvg | tee -a ${LOG_FILE}'
             }
         }
 
@@ -40,13 +43,15 @@ pipeline {
             steps {
                 echo 'Tool used: Java Runtime'
                 echo 'Running PrintElements.java...'
-                sh 'java -cp out PrintElements'
+                sh 'echo "Running PrintElements.java..." | tee -a ${LOG_FILE}'
+                sh 'java -cp out PrintElements | tee -a ${LOG_FILE}'
             }
         }
 
         stage('Run Tests') {
             steps {
                 echo "Tool used: JUnit"
+                sh 'echo "Tool used: JUnit" | tee -a ${LOG_FILE}'
                 // Run Java test logic here
             }
         }
@@ -54,6 +59,7 @@ pipeline {
         stage('Security Scan') {
             steps {
                 echo "Tool used: SpotBugs"
+                sh 'echo "Tool used: SpotBugs" | tee -a ${LOG_FILE}'
                 // Example tool for Java code analysis
             }
         }
@@ -62,24 +68,24 @@ pipeline {
     post {
         always {
             script {
-                // Capture logs using Jenkins API
-                def logs = currentBuild.rawBuild.getLog(10000).join('\n')
-                def subjectPrefix = currentBuild.currentResult == 'SUCCESS' ? '✅ SUCCESS' : '❌ FAILURE'
-                
+                def logs = readFile("${env.LOG_FILE}")
+                def status = currentBuild.currentResult
+                def emoji = (status == 'SUCCESS') ? '✅' : '❌'
+
                 mail (
                     to: "${env.RECIPIENT}",
-                    subject: "${subjectPrefix}: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
+                    subject: "${emoji} ${status}: ${env.JOB_NAME} [#${env.BUILD_NUMBER}]",
                     body: """
-Build Result: ${currentBuild.currentResult}
+Build Status: ${status}
 Job: ${env.JOB_NAME}
 Build Number: ${env.BUILD_NUMBER}
 Build URL: ${env.BUILD_URL}
 
-=========== Build Logs ===========
+============= Build Logs =============
 ${logs}
-==================================
+======================================
 
-                    """.stripIndent(),
+""",
                     mimeType: 'text/plain'
                 )
             }
